@@ -1,0 +1,230 @@
+<!-- Inheriting all linked files -->
+{% extends 'base.html' %} {% include 'header.html' %}
+
+<!-- head section -->
+{% block title %} FPF Tech {% endblock %}
+
+<!-- Body section -->
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="jumbotron p-3">
+
+                <h3><b>Projects</b> <button type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#mymodal">Add New Project</button> </h3>
+
+                {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
+
+                <div class="alert alert-success alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                        <span aria-hidden="true">
+                            x
+                        </span>
+                    </button> {{message}}
+                </div>
+
+                {% endfor %} {% endif %} {%endwith%}
+
+                <table class="table table-hover table-dark">
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Value</th>
+                        <th>Risk</th>
+                        <th>Action</th>
+                    </tr>
+
+                    {% for row in all_data %}
+
+                    <tr>
+                        <th>{{row.id}}</th>
+                        <th>{{row.name}}</th>
+                        <th>{{row.startDate}}</th>
+                        <th>{{row.endDate}}</th>
+                        <th>{{row.value}}</th>
+                        <th>{{row.risk}}</th>
+                        <th>
+                            <a href="/update/{{row.id}}" class="btn btn-info btn-xs" data-toggle="modal" data-target="#modaledit{{row.id}}">Edit</a>
+                            <a href="/delete/{{row.id}}" class="btn btn-danger btn-xs" onclick="return confirm('Are You sure To Delete ?')">Delete</a>
+                            <a href="/simulate/{{row.id}}" class="btn btn btn-light btn-xs" data-toggle="modal" data-target="#modalsimulate{{row.id}}">Simulate</a>
+                        </th>
+                    </tr>
+
+                    <!-- Model for updating project data -->
+                    <div id="modaledit{{row.id}}" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title"> Update Project Data </h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{{url_for('update')}}" method="POST">
+
+                                        <div class="form-group">
+                                            <label>Name</label>
+                                            <input type="hidden" name="id" value="{{row.id}}">
+                                            <input type="text" class="form-control" name="name" value="{{row.name}}" required="1">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Start Date</label>
+                                            <input type="date" class="form-control" name="startDate" value="{{row.startDate}}" required="1">
+                                        
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>End Date</label>
+                                            <input type="date" class="form-control" name="endDate" value="{{row.startDate}}" required="1">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Value</label>
+                                            <input type="number" class="form-control" name="value" value="{{row.value}}" required="1" min="0" step=".01">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Risk</label>
+                                            <input type="number" class="form-control" name="risk" value="{{row.risk}}" required="1" min="0" max="2">
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button class="btn btn-info" type="submit">Update</button>
+                                            <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="modalsimulate{{row.id}}" class="modal fade" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title"> Investment Simulation </h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="" method="get">
+
+                                        <div class="form-group">
+                                            <label>Name</label>
+                                            <input type="hidden" name="id" value="{{row.id}}">
+                                            <input type="text" class="form-control" name="name" value="{{row.name}}" required="1" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Value</label>
+                                            <input type="hidden" name="id" value="{{row.id}}">
+                                            <input type="text" class="form-control" name="numonly"  value="{{row.value}}" required="1" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Risk</label>
+                                            <input type="hidden" name="id" value="{{row.id}}">
+                                            <input type="text" class="form-control" name="numonly"  value="{{row.risk}}" required="1" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Investiment</label>
+                                            <input type="number" class="form-control" id="investimentID" required="1" min="{{row.value}}" step=".01">
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <!-- <div><button onclick="cbGetDialog()">Show dialog</button></div> -->
+                                            <button class="btn btn-secondary" class="btn btn-danger btn-xs" onclick="calculate('{{row.risk}}')">Calculate</button>
+                                        </div>
+                                    
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+
+                </table>
+
+            </div>
+
+            <!-- Model for adding project -->
+            <div id="mymodal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title"> Add Project </h4>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{url_for('insert')}}" method="POST">
+
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" class="form-control" name="name" required="1">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="date" class="form-control" name="startDate" required="1">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="date" class="form-control" name="endDate" required="1">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Value</label>
+                                    <input type="number" class="form-control" name="value" required="1" min="0" step=".01">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Risk</label>
+                                    <input type="number" class="form-control" name="numonly" required="1" min="0" max="2">
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button class="btn btn-success" type="submit"> Add Project </button>
+                                    <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function calculate(risk){
+
+        var value = document.getElementById('investimentID').value;
+
+        if (risk == 0)
+            var result = value * 0.05
+        else if (risk == 1)
+            var result = value * 0.1
+        else
+            var result = value * 0.2
+
+        alert('The result will be: ' + result)
+    }
+
+    $(function() {
+        $("input[name='numonly']").on('input', function(e) {
+            $(this).val($(this).val().replace(/[^0-9]/g, ''));
+        });
+    });
+
+</script>
+
+
+{% endblock %}
