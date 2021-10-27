@@ -34,19 +34,26 @@ def index():
 # update function will be called into index.html to persist data.
 @app.route('/insert', methods = ['POST'])
 def insert():
-    if request.method == 'POST':
-        name = request.form['name']
-        startDate = request.form['startDate']
-        endDate = request.form['endDate']
-        value = request.form['startDate']
-        risk = request.form['risk']
 
-        my_data = Crud(name, startDate, endDate, value, risk)
-        db.session.add(my_data)
-        db.session.commit()
-
+    print('NOME: ' + request.form['name'])
+    
+    try:
+        if request.method == 'POST':
+            name = request.form['name']
+            startDate = request.form['startDate']
+            endDate = request.form['endDate']
+            value = request.form['value']
+            risk = request.form['risk']
+            my_data = Crud(name, startDate, endDate, value, risk)
+            db.session.add(my_data)
+            db.session.commit()
+        
         flash("Project Inserted Successfully")
         return redirect(url_for('index'))
+
+    except:
+        print("algo deu errado aqui!")
+
 
 # update function will be called into index.html to edit and persist the data of the project.
 @app.route('/update', methods = ['POST'])
