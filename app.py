@@ -34,8 +34,6 @@ def index():
 # update function will be called into index.html to persist data.
 @app.route('/insert', methods = ['POST'])
 def insert():
-
-    print('NOME: ' + request.form['name'])
     
     try:
         if request.method == 'POST':
